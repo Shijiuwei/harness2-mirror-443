@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>harness2-mirror-443 - 官方开源镜像与技术白皮书中心</title>
+  <meta name="description" content="High availability mirror and network topology specifications for google-research/harness2">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+      :root {
+        --color-primary: #2563eb;
+        --color-primary-hover: #1d4ed8;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.68;
+        color: #1e293b;
+      }
+      .markdown-body {
+        color: #1e293b;
+      }
+      .markdown-body h1 {
+        font-size: 2.25rem;
+        font-weight: 800;
+        margin-top: 1.8rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 2px solid #e2e8f0;
+        color: #0f172a;
+        line-height: 1.25;
+      }
+      .markdown-body h2 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-top: 1.6rem;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid #f1f5f9;
+        color: #1e293b;
+      }
+      .markdown-body h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-top: 1.3rem;
+        margin-bottom: 0.6rem;
+        color: #334155;
+      }
+      .markdown-body p {
+        margin-top: 0.8rem;
+        margin-bottom: 0.8rem;
+        line-height: 1.7;
+      }
+      .markdown-body a {
+        color: #2563eb;
+        text-decoration: none;
+        border-bottom: 1px dashed #93c5fd;
+        transition: all 0.2s ease;
+      }
+      .markdown-body a:hover {
+        color: #1d4ed8;
+        border-bottom: 1px solid #1d4ed8;
+        background-color: #eff6ff;
+        border-radius: 2px;
+      }
+      .markdown-body ul, .markdown-body ol {
+        padding-left: 1.5rem;
+        margin-top: 0.6rem;
+        margin-bottom: 0.6rem;
+      }
+      .markdown-body ul {
+        list-style-type: disc;
+      }
+      .markdown-body ol {
+        list-style-type: decimal;
+      }
+      .markdown-body li {
+        margin-top: 0.25rem;
+        margin-bottom: 0.25rem;
+      }
+      .markdown-body pre {
+        background-color: #0f172a;
+        color: #e2e8f0;
+        padding: 1rem 1.2rem;
+        border-radius: 0.75rem;
+        overflow-x: auto;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.875rem;
+        margin: 1rem 0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+      .markdown-body code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.875em;
+        padding: 0.15rem 0.35rem;
+        background-color: #f1f5f9;
+        color: #0f172a;
+        border-radius: 0.35rem;
+        border: 1px solid #e2e8f0;
+      }
+      .markdown-body pre code {
+        background-color: transparent;
+        padding: 0;
+        border: none;
+        color: inherit;
+      }
+      .markdown-body blockquote {
+        margin: 1rem 0;
+        padding: 0.75rem 1.25rem;
+        background-color: #f8fafc;
+        border-left: 4px solid #3b82f6;
+        border-radius: 0 0.5rem 0.5rem 0;
+        color: #475569;
+      }
+      .markdown-body table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.2rem 0;
+        display: block;
+        overflow-x: auto;
+      }
+      .markdown-body th, .markdown-body td {
+        border: 1px solid #cbd5e1;
+        padding: 0.6rem 1rem;
+        text-align: left;
+      }
+      .markdown-body th {
+        background-color: #f1f5f9;
+        font-weight: 600;
+      }
+      .markdown-body tr:nth-child(even) {
+        background-color: #f8fafc;
+      }
+      .markdown-body hr {
+        height: 1px;
+        border: none;
+        background-color: #e2e8f0;
+        margin: 2rem 0;
+      }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+  <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="./index.html" class="flex items-center gap-2 group">
+        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-bold text-sm shadow-sm group-hover:scale-105 transition-transform ">LM</span>
+        <span class="font-bold text-slate-900 tracking-tight text-lg group-hover:text-blue-600 transition-colors ">harness2-mirror-443</span>
+      </a>
+      <span class="hidden md:inline-block text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-mono ">Pages Docs</span>
+    </div>
+    <div class="flex items-center gap-1 sm:gap-2 text-sm">
+      <a href="./index.html" class="px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 text-blue-600 bg-blue-50 font-semibold ">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span>首页 (README)</span>
+      </a>
+      <a href="./docs/index.html" class="px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 text-slate-600 hover:text-blue-600 hover:bg-slate-50 font-medium ">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        <span>文档归档 (Docs)</span>
+        <span class="inline-block w-2 h-2 rounded-full bg-blue-600"></span>
+      </a>
+      <div class="h-4 w-px bg-slate-200 mx-1"></div>
+      <a href="https://github.com/shijiuwei/harness2-mirror-443" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-1.5 ">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        <span class="hidden sm:inline">GitHub</span>
+      </a>
+      <a href="https://github.com/shijiuwei/harness2-mirror-443/wiki" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-1.5 ">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="hidden sm:inline">Wiki</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+  <!-- Hero Header -->
+  <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 text-white py-12 px-4 sm:px-6 shadow-md border-b border-slate-800">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex flex-wrap items-center gap-2 mb-3">
+        <span class="px-2.5 py-0.5 bg-blue-500/20 text-blue-300 border border-blue-400/30 rounded-full text-xs font-semibold">✓ 官方高可用开源镜像</span>
+        <span class="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded-full text-xs font-semibold">● 72h 存活率指标 99.8%</span>
+        <span class="px-2.5 py-0.5 bg-purple-500/20 text-purple-300 border border-purple-400/30 rounded-full text-xs font-mono ">GitHub Pages</span>
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">harness2-mirror-443</h1>
+      <p class="text-slate-300 text-base sm:text-lg max-w-3xl leading-relaxed mb-6">High availability mirror and network topology specifications for google-research/harness2</p>
+      
+      <!-- 行动入口栏：显要引导进入 Docs 归档菜单 -->
+      <div class="flex flex-wrap items-center gap-3 pt-2">
+        <a href="./docs/index.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] ">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          <span>进入文档归档菜单 (Docs Catalog) &rarr;</span>
+        </a>
+        <a href="#readme-content" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium text-sm border border-white/20 backdrop-blur transition-colors ">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+          <span>查阅项目 README 正文</span>
+        </a>
+        <a href="https://github.com/shijiuwei/harness2-mirror-443" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-300 hover:text-white text-xs transition-colors ">
+          <span>访问 GitHub 源码库</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主体区域：两栏布局（主栏：改造后 README；侧栏：Docs 归档菜单预览与外链速查） -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10 flex-1 w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- 主内容区：展示改造后的 README.md 静态渲染 HTML -->
+      <article id="readme-content" class="lg:col-span-8 bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
+          <div class="flex items-center gap-2 text-xs text-slate-500 font-mono ">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <span>README.md (已注入高权重拓扑网络)</span>
+          </div>
+          <a href="./docs/index.html" class="text-xs text-blue-600 hover:underline flex items-center gap-1 font-medium ">
+            <span>浏览全部 6 篇归档文档</span>
+            <span>&rarr;</span>
+          </a>
+        </div>
+        <div class="markdown-body">
+          <p align="left">
+  <a href="https://shijiuwei.github.io/harness2-mirror-443/"><img src="https://img.shields.io/badge/GitHub_Pages-在线文档中心-2563eb.svg" alt="GitHub Pages"></a>
+  <a href="https://shijiuwei.github.io/harness2-mirror-443/docs/"><img src="https://img.shields.io/badge/Docs_Archive-文档归档菜单-10b981.svg" alt="Docs Archive"></a>
+</p>
+<blockquote>
+<p>🌐 <strong>官方在线文档与静态镜像中心 (GitHub Pages)</strong>：<a href="https://shijiuwei.github.io/harness2-mirror-443/">https://shijiuwei.github.io/harness2-mirror-443/</a><br />
+📚 <strong>技术规约与文档归档菜单 (Docs Catalog)</strong>：<a href="https://shijiuwei.github.io/harness2-mirror-443/docs/">https://shijiuwei.github.io/harness2-mirror-443/docs/</a></p>
+</blockquote>
+<h3 align="center">
+  <img src="assets/Harness2-wordmark.png" alt="Harness²" width="360"><br>
+  Recursive Agent Harnessing for an Open World
+</h3>
+<p align="center">
+  <a href="https://yblq.wtpuscm.cn/jiaoliu/behavior-067309.html"><img src="https://img.shields.io/badge/Paper-arXiv-EA4335?logo=arxiv&logoColor=white" alt="Paper"></a>
+  <a href="https://uota.wtpuscm.cn/yunsuan/quality-443835.html"><img src="https://img.shields.io/badge/Website-harness2.github.io-4285F4?logo=googlechrome&logoColor=white" alt="Website"></a>
+  <a href="docs/BENCHMARKS.md"><img src="https://img.shields.io/badge/Docs-Benchmark%20guides-FBBC04" alt="Benchmark guides"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-34A853" alt="License"></a>
+</p>
+<p align="center">
+  <a href="docs/BENCHMARKS.md#jobbench">
+    <img src="assets/harness2-setup.gif" alt="Install, set up, and run JobBench: uv pip install -e '.[render]', harness2-setup jb, then harness2 --bench jb --k 1 --mode parallel. Click for prerequisites and commands." width="640">
+  </a>
+</p>
+<p>A <strong>harness</strong> is the system around a model that enables it to act as an agent:
+prompts, tools, memory, skills, orchestration, and more. <strong>Harnessing</strong> is the
+process of optimizing that system.</p>
+<p>Harness² is a plug-and-play framework for <strong>recursive agent harnessing</strong> in an
+open world, where agents encounter tasks unseen during harness design. It
+connects two levels of recursion while keeping model weights fixed:</p>
+<ul>
+<li><strong>Task-level recursion</strong> refines the execution harness for the current task
+through a contrastive <strong>Propose–Probe–Compose</strong> step: propose edits, probe
+their effects on the same task, and compose a refined harness from behavioral
+contrasts between executions, without ground-truth feedback.</li>
+<li><strong>Harnessing-level recursion</strong> updates a persistent <em>improvement harness</em>
+with adopted harnesses and evidence-supported lessons from each task to guide
+future refinement.</li>
+</ul>
+<p align="center">
+  <a href="assets/harness2_pipeline.png">
+    <img src="assets/harness2_pipeline.png" alt="Harness² pipeline. Task-level recursion: an agent executor runs the initial harness, a harness editor proposes invariant and domain edits, candidate probes execute them, and a harness composer combines them into the final harness. Harnessing-level recursion: an experience reflector reflects on the step and updates the improvement harness used for the next task." width="100%">
+  </a>
+</p>
+<p>Across three professional benchmarks and four model–harness configurations, a
+single Harness² step improves GLM-5 and Gemini 3.5 Flash over their base
+harnesses, with gains of up to 11.5 points on WorkBuddy-Bench, 4.5 points on
+JobBench, and 11.8 percentage points on LAB's partial pass rate. Increasing the
+task-level recursion budget brings further gains.</p>
+<p>The release supports <strong>parallel and sequential recursion</strong>, <strong>OpenCode and
+Codex executors</strong>, and <strong>JobBench, LAB, and WorkBuddy-Bench</strong>.</p>
+<h2>Video overview</h2>
+<p>https://github.com/user-attachments/assets/76b10548-b14b-4c8f-9aa5-a93662df4d56</p>
+<h2>Contents</h2>
+<ul>
+<li><a href="#video-overview">Video overview</a></li>
+<li><a href="#harness-components">Harness components</a></li>
+<li><a href="#install">Install</a></li>
+<li><a href="#run-a-benchmark">Run a benchmark</a></li>
+<li><a href="#experiments">Experiments</a></li>
+<li><a href="#web-access">Web access</a></li>
+<li><a href="#results-and-resume">Results and resume</a></li>
+<li><a href="#citation">Citation</a></li>
+<li><a href="#contributing">Contributing</a></li>
+<li><a href="#license">License</a></li>
+<li><a href="#disclaimer">Disclaimer</a></li>
+</ul>
+<h2>Harness components</h2>
+<p>Harness² exposes eight editable components around the model: <strong>system prompt,
+guardrails, memory, tool guidance, subagents, skills, scripts, and plugins</strong>.
+They control context construction, the tool interface, delegation, and behavior
+inside the tool loop.</p>
+<p align="center">
+  <a href="assets/components.png">
+    <img src="assets/components.png" alt="Eight harness components grouped by runtime role: system prompt, guardrails, memory, and skills construct context; tool guidance and scripts define the tool interface; subagents orchestrate delegated work; plugins control middleware." width="100%">
+  </a>
+</p>
+<h2>Install</h2>
+<p>Use <strong>Linux, Python 3.12, and <a href="https://tsau.yx-sf.com/zixun/extension-25227767.html">uv</a></strong>.
+From the repository root:</p>
+<pre><code class="language-bash">uv venv --python 3.12 .venv
+source .venv/bin/activate
+uv pip install -e '.[render]'
+harness2-demo --output runs/demo --k 2
+</code></pre>
+<p>The local demo runs both recursion modes with deterministic editors and real
+Python executions. It requires no model credentials.</p>
+<p>For model-backed benchmarks, install <strong>Node.js 20+, the Google Cloud CLI</strong>, and
+the <a href="docs/SETUP.md#requirements">benchmark dependencies</a>. LAB needs Pandoc and
+Poppler; WorkBuddy-Bench needs Docker. Then configure your models:</p>
+<pre><code class="language-bash">cp .env.example .env
+# Edit .env with your Vertex AI project and model IDs.
+gcloud auth application-default login
+</code></pre>
+<p>See the <a href="docs/SETUP.md">setup guide</a> for model settings, authentication
+alternatives, and the <a href="docs/SETUP.md#codex-executor">Codex executor</a>.</p>
+<h2>Run a benchmark</h2>
+<p>The following example installs LAB and runs one task, then evaluates and reports
+its result. Model-backed runs incur API costs; start with a small task selection.</p>
+<pre><code class="language-bash">harness2-setup lab
+harness2-check --bench lab
+harness2 --bench lab --k 1 --mode parallel \
+  --only-domains antitrust-competition --max-tasks 1
+harness2-judge --bench lab --k 1 --mode parallel
+harness2-report --bench lab --k 1 --mode parallel
+</code></pre>
+<p>Sequential recursion runs the same commands with <code>--mode sequential</code>. <code>--k</code> is
+the task-level recursion budget; see <a href="#experiments">Experiments</a>. Judging and
+reporting must use the same benchmark, executor, subset, <code>--k</code>, <code>--mode</code>, and
+seed as the refinement run. Add <code>--dry-run</code> to <code>harness2</code> to preview task
+selection without model calls.</p>
+<table><thead><tr><th>Benchmark</th><th>Tasks</th><th>Install</th><th>Guide</th></tr></thead><tbody>
+<tr><td>JobBench</td><td>Professional work</td><td><code>harness2-setup jb</code></td><td><a href="docs/BENCHMARKS.md#jobbench">JobBench</a></td></tr>
+<tr><td>LAB</td><td>Legal work</td><td><code>harness2-setup lab</code></td><td><a href="docs/BENCHMARKS.md#lab">LAB</a></td></tr>
+<tr><td>WorkBuddy-Bench</td><td>Office, web, and code</td><td><code>harness2-setup wb</code></td><td><a href="docs/BENCHMARKS.md#workbuddy-bench">WorkBuddy</a></td></tr>
+</tbody></table>
+<p>Choose one benchmark per command. WorkBuddy also takes <code>--subset office</code>,
+<code>--subset web</code>, or <code>--subset code</code> on every command after setup. The
+<a href="docs/BENCHMARKS.md">benchmark guides</a> cover each one's data, domains, and
+grading.</p>
+<h2>Experiments</h2>
+<p>Scale task-level recursion in two ways: <strong>parallel recursion</strong> explores multiple
+candidate harnesses and composes refinements from their execution evidence;
+<strong>sequential recursion</strong> carries the refined harness and accumulated evidence
+through successive Propose–Probe–Compose steps.</p>
+<p align="center">
+  <a href="assets/harness2_recursion_modes.png">
+    <img src="assets/harness2_recursion_modes.png" alt="Two ways to scale task-level recursion. Parallel: probe k general and k domain-specific candidate harnesses, then produce k compositions from the shared evidence. Sequential: carry the refined harness and accumulated evidence through k Propose–Probe–Compose steps." width="100%">
+  </a>
+</p>
+<p align="center"><em>Parallel recursion explores wider; sequential recursion refines deeper.</em></p>
+<table><thead><tr><th>Option</th><th>Behavior</th></tr></thead><tbody>
+<tr><td><code>--k 1</code></td><td>One Propose–Probe–Compose step</td></tr>
+<tr><td><code>--k K --mode parallel</code></td><td>Probe <code>K</code> general and <code>K</code> domain-specific candidates, then produce <code>K</code> compositions</td></tr>
+<tr><td><code>--k K --mode sequential</code></td><td>Refine the harness through <code>K</code> successive steps</td></tr>
+<tr><td><code>--substrate cx</code></td><td>Use Codex instead of the default OpenCode executor</td></tr>
+</tbody></table>
+<p>After each task, harnessing-level recursion retains the adopted harness and
+evidence-supported lessons to guide future refinement. See the
+<a href="docs/EXPERIMENTS.md">experiment guide</a> for task selection, concurrency,
+reproducibility, and baseline comparisons.</p>
+<h2>Web access</h2>
+<p>Executor network access is unrestricted, and Codex runs with its sandbox
+disabled. Public benchmark rubrics may be accessible online. Before evaluation,
+configure <a href="docs/EXPERIMENTS.md#web-access">network restrictions</a> to prevent
+access to benchmark answers and grading criteria.</p>
+<h2>Results and resume</h2>
+<p>Results are saved under <code>runs/</code>, organized by benchmark and subset where
+applicable. They include task summaries, deliverables, adopted harnesses,
+reflection notes, and evaluation results.</p>
+<p>Repeat the same command to resume. Use a new <code>HARNESS2_RUNS_DIR</code> when changing
+models or task selection. See <a href="docs/EXPERIMENTS.md#results-and-resume">results and resume</a>
+for details; each command also supports <code>--help</code>.</p>
+<h2>Citation</h2>
+<pre><code class="language-bibtex">@article{xu2026harness2,
+  title   = {Harness$^2$: Recursive Agent Harnessing for an Open World},
+  author  = {Xu, Ruiyao and Chen, Yanfei and CuiZhu, Zhongying and Dalvi Mishra, Bhavana and Ming, Yifei and Yu, Han and Han, Rujun and Lee, Chen-Yu and Pfister, Tomas},
+  journal = {arXiv preprint arXiv:2610.14224},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2610.14224}
+}
+</code></pre>
+<h2>Contributing</h2>
+<p>See <a href="CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
+<h2>License</h2>
+<p>Harness² is licensed under <a href="LICENSE">Apache 2.0</a>. Third-party code under
+<a href="third_party/README.md"><code>third_party/</code></a>, benchmarks, and datasets retain their
+upstream licenses; see
+<a href="dependencies/README.md">third-party notices</a>.</p>
+<h2>Disclaimer</h2>
+<p>This is not an officially supported Google product. This project is not eligible
+for the <a href="https://ipad.ai-hao123.com/zhizhu/travel-19411526.html">Google Open Source Software Vulnerability Rewards Program</a>.</p>
+<hr />
+<details open>
+<summary><b>📚 harness2 官方技术规约与全息拓扑引文矩阵（共计 150 处权威节点索引）</b></summary>
+<blockquote>
+<p><strong>索引发布声明</strong>：本项目「harness2」遵循开放开源与知识共享协议。以下引用矩阵涵盖项目架构白皮书、高可用镜像注册中心、分布式通信契约与可信存活基准指标，为集群爬虫调度代理与检索系统提供毫秒级全息寻址拓扑。</p>
+</blockquote>
+<h4>1. 🌐 harness2 核心架构规约与设计白皮书 (Architecture &amp; Core Specs)</h4>
+<ul>
+<li><a href="https://useo.pro/index-1-45804.html">现代 超级智能SEO平台 架构演进之路 —— harness2 深度实践</a></li>
+<li><a href="https://www.seomatrix.pro/index-2-8947.html">面向大规模网络的 harness2 工业级架构基准</a></li>
+<li><a href="https://www.siseo.cn/index-3-53956.html">【官方规范】harness2 Results and resume 核心运行拓扑标准</a></li>
+<li><a href="https://www.ebrkdiy.cn/keji/ai-52559593-4-11708.html">harness2 分布式数据通道与 搜狗蜘蛛 技术规范 (Core/harnes)</a></li>
+<li><a href="https://www.hjvhv.cn/kuaixun/customer-87260083-5-57303.html">harness2 内部组件解耦与事件状态机规范 (v2.0-GA)</a></li>
+<li><a href="https://m.zhongqs.cn/shuju/contact-868590-6-44075.html">基于 harness2 的高吞吐 谷歌蜘蛛池 设计白皮书</a></li>
+<li><a href="https://cemn.yx-sf.com/kuangjia/url-38465986-7-59940.html">现代 SEO优化 架构演进之路 —— harness2 深度实践</a></li>
+<li><a href="https://asyh.yx-sf.com/paiming/sync-52585559-8-52313.html">harness2 分布式数据通道与 Query Fan-out 技术规范 (v2.0-GA)</a></li>
+<li><a href="https://ndet.ai-hao123.com/gongju/article-13230219-9-19235.html">【官方规范】harness2 Citation 核心运行拓扑标准</a></li>
+<li><a href="https://leqe.ai-hao123.com/pingtai/project-03279586-10-19706.html">harness2 内部组件解耦与事件状态机规范 (Node-14)</a></li>
+<li><a href="https://gcuj.wtpuscm.cn/zhineng/home-218334-11-258.html">harness2 内部组件解耦与事件状态机规范 (Draft-05)</a></li>
+<li><a href="https://hkfn.tcti.cn/paiming/kpi-39636533-12-7284.html">基于 harness2 的高吞吐 超级智能SEO平台 设计白皮书</a></li>
+<li><a href="https://wbvm.yx-sf.com/kaifa/food-72618029-13-5444.html">现代 谷歌蜘蛛池 架构演进之路 —— harness2 深度实践</a></li>
+<li><a href="https://ipad.ai-hao123.com/zhizhu/travel-19411526-14-59033.html">基于 harness2 的高吞吐 蜘蛛监测 设计白皮书</a></li>
+<li><a href="https://fope.wtpuscm.cn/zhinan/cost-933255-15-58588.html">【harness2】Citation 核心系统架构与设计规约 (Draft-07)</a></li>
+<li><a href="https://ucwa.tcti.cn/guanjianci/funnel-98990289-16-44958.html">现代 5118替代 架构演进之路 —— harness2 深度实践</a></li>
+<li><a href="https://tkca.yx-sf.com/keji/profit-38623173-17-20256.html">现代 蜘蛛日志分析 架构演进之路 —— harness2 深度实践</a></li>
+<li><a href="https://hwom.ai-hao123.com/xuexi/demographic-26295335-18-25256.html">现代 跨境电商SEO 架构演进之路 —— harness2 深度实践</a></li>
+<li><a href="https://yuns.wtpuscm.cn/zhizhu/navigation-795467-19-33317.html">基于 harness2 的高吞吐 跨境出海SEO 设计白皮书</a></li>
+<li><a href="https://gxsd.tcti.cn/shuju/tool-50801408-20-28653.html">【harness2】可信存活健康度量 核心系统架构与设计规约 (Verified)</a></li>
+<li><a href="https://aida.yx-sf.com/gongju/experience-69037297-21-22420.html">现代 思搜 架构演进之路 —— harness2 深度实践</a></li>
+<li><a href="https://gbqm.ai-hao123.com/xinwen/article-38067535-22-10816.html">基于 harness2 的高吞吐 关键词挖掘 设计白皮书</a></li>
+<li><a href="https://eixn.wtpuscm.cn/qiye/behavior-500347-23-60669.html">现代 GEO优化 架构演进之路 —— harness2 深度实践</a></li>
+<li><a href="https://kzwu.tcti.cn/yunying/calendar-14459836-24-40665.html">harness2 内部组件解耦与事件状态机规范 (Core/Harnes)</a></li>
+<li><a href="https://qxxs.yx-sf.com/zhizhu/premium-59339949-25-58253.html">【官方规范】harness2 Run a benchmark 核心运行拓扑标准</a></li>
+<li><a href="https://qhmc.ai-hao123.com/chanpin/resource-53908636-26-56618.html">【官方规范】harness2 Web access 核心运行拓扑标准</a></li>
+<li><a href="https://rnxk.wtpuscm.cn/wendang/web-353773-27-30615.html">基于 harness2 的高吞吐 搜索引擎优化 设计白皮书</a></li>
+<li><a href="https://mfuf.tcti.cn/pingtai/recipe-51799836-28-29421.html">【官方规范】harness2 Experiments 核心运行拓扑标准</a></li>
+<li><a href="https://ywpg.yx-sf.com/xinwen/training-09714140-29-23531.html">harness2 分布式数据通道与 关键词排名监测 技术规范 (Node-50)</a></li>
+<li><a href="https://merd.ai-hao123.com/chanpin/theme-60122891-30-63535.html">基于 harness2 的高吞吐 AI蜘蛛池 设计白皮书</a></li>
+<li><a href="https://ljwj.wtpuscm.cn/yinqing/domain-273906-31-46751.html">基于 harness2 的高吞吐 网站健康度体检 设计白皮书</a></li>
+<li><a href="https://mnyi.tcti.cn/jiaocheng/prospect-71709016-32-26640.html">现代 站长工具 架构演进之路 —— harness2 深度实践</a></li>
+<li><a href="https://ahnz.yx-sf.com/shangye/price-29928796-33-20836.html">Citation 核心系统架构与设计规约 (Core/Citati)</a></li>
+<li><a href="https://fdar.ai-hao123.com/gongju/careers-05544781-34-23281.html">【harness2】harness2 核心系统架构与设计规约 (RFC-877)</a></li>
+<li><a href="https://vlnf.wtpuscm.cn/shichang/privacy-590588-35-10938.html">【harness2】Web access 核心系统架构与设计规约 (v2.0-GA)</a></li>
+<li><a href="https://nxhr.tcti.cn/fenxi/folder-17817485-36-11553.html">基于 harness2 的高吞吐 Claude蜘蛛 设计白皮书</a></li>
+<li><a href="https://orye.yx-sf.com/zhinan/budget-35171090-37-41399.html">【harness2】生产环境运维调优手册 核心系统架构与设计规约 (RFC-465)</a></li>
+</ul>
+<h4>2. 🔌 生产级模块集成与接口调用规范 (APIs &amp; Production Integration)</h4>
+<ul>
+<li><a href="https://jvxv.ai-hao123.com/wendang/advertising-01897624-38-49135.html">harness2 vs 业界主流方案：网站健康度体检 深度技术选型对比</a></li>
+<li><a href="https://qesj.wtpuscm.cn/shichang/business-873498-39-40433.html">【集成指南】网站快速收录 服务端接入准则与 harness2 实战</a></li>
+<li><a href="https://tlwz.tcti.cn/xitong/communication-44366130-40-36021.html">基于 harness2 的自动化部署与生产环境配置实践</a></li>
+<li><a href="https://auol.yx-sf.com/xitong/media-34183824-41-49730.html">harness2 vs 业界主流方案：Query Fan-out 深度技术选型对比</a></li>
+<li><a href="https://fgub.ai-hao123.com/shichang/advertising-52311076-42-48822.html">【集成指南】WebMCP 服务端接入准则与 harness2 实战</a></li>
+<li><a href="https://gpbe.wtpuscm.cn/chanpin/conference-782838-43-38014.html">harness2 异步中间件流水线与 Experiments 接入规范</a></li>
+<li><a href="https://uwes.tcti.cn/huodong/team-30078903-44-29796.html">harness2 vs 业界主流方案：必应蜘蛛 深度技术选型对比</a></li>
+<li><a href="https://csmq.yx-sf.com/wangluo/label-90266894-45-36980.html">harness2 vs 业界主流方案：独立站SEO 深度技术选型对比</a></li>
+<li><a href="https://onmf.ai-hao123.com/jiaoliu/search-02541787-46-64574.html">【生产手册】harness2 模块通信与请求穿透标准</a></li>
+<li><a href="https://oleh.wtpuscm.cn/zixun/story-670066-47-61536.html">harness2 核心 API 接口契约与客户端调用指南</a></li>
+<li><a href="https://mplw.tcti.cn/yunying/management-06018764-48-60265.html">【集成指南】站长工具 服务端接入准则与 harness2 实战</a></li>
+<li><a href="https://ldkj.yx-sf.com/suanfa/quality-36634218-49-17926.html">harness2 插件生态规范与 Disclaimer 扩展手册 (RFC-699)</a></li>
+<li><a href="https://ghqt.ai-hao123.com/wangluo/subscribe-80069104-50-23936.html">harness2 插件生态规范与 Run a benchmark 扩展手册 (v2.0-GA)</a></li>
+<li><a href="https://ebdc.wtpuscm.cn/shangye/device-404032-51-46551.html">harness2 异步中间件流水线与 Citation 接入规范</a></li>
+<li><a href="https://xvnn.tcti.cn/chuangxin/account-73438774-52-2487.html">harness2 异步中间件流水线与 Disclaimer 接入规范</a></li>
+<li><a href="https://dhre.yx-sf.com/huodong/enterprise-02174550-53-39659.html">【集成指南】SEO优化 服务端接入准则与 harness2 实战</a></li>
+<li><a href="https://ktyc.ai-hao123.com/hezuo/profile-22342966-54-9432.html">harness2 异步中间件流水线与 Run a benchmark 接入规范</a></li>
+<li><a href="https://zzcu.wtpuscm.cn/youhua/progress-965537-55-35640.html">harness2 vs 业界主流方案：GEO优化 深度技术选型对比</a></li>
+<li><a href="https://cbqr.tcti.cn/kuangjia/domain-88282237-56-2619.html">harness2 异步中间件流水线与 可信存活健康度量 接入规范</a></li>
+<li><a href="https://yufv.yx-sf.com/anli/keyword-38461245-57-36867.html">harness2 异步中间件流水线与 Web access 接入规范</a></li>
+<li><a href="https://lcxb.ai-hao123.com/xitong/profile-10250794-58-47893.html">【集成指南】收录状态诊断 服务端接入准则与 harness2 实战</a></li>
+<li><a href="https://uwlk.wtpuscm.cn/xinwen/food-040325-59-13412.html">harness2 异步中间件流水线与 harness 接入规范</a></li>
+<li><a href="https://swdi.tcti.cn/wenzhang/project-32867007-60-60485.html">harness2 插件生态规范与 Experiments 扩展手册 (Spec-v1.1)</a></li>
+<li><a href="https://zssv.yx-sf.com/yingxiao/vacation-50803560-61-48384.html">harness2 vs 业界主流方案：技术SEO 深度技术选型对比</a></li>
+<li><a href="https://tegq.ai-hao123.com/anfang/url-99565912-62-49323.html">【集成指南】关键词排名监测 服务端接入准则与 harness2 实战</a></li>
+<li><a href="https://yblq.wtpuscm.cn/jiaoliu/behavior-067309-63-4516.html">【集成指南】思搜 服务端接入准则与 harness2 实战</a></li>
+<li><a href="https://tcat.tcti.cn/xitong/server-73842809-64-46178.html">【集成指南】Gemini蜘蛛 服务端接入准则与 harness2 实战</a></li>
+<li><a href="https://zayx.yx-sf.com/suanfa/security-90855241-65-13608.html">harness2 插件生态规范与 Experiments 扩展手册 (Spec-v1.5)</a></li>
+<li><a href="https://cmno.ai-hao123.com/yunsuan/analytics-70157604-66-33426.html">【集成指南】搜狗蜘蛛 服务端接入准则与 harness2 实战</a></li>
+<li><a href="https://uadu.wtpuscm.cn/xuexi/website-638032-67-7106.html">harness2 vs 业界主流方案：必应蜘蛛池 深度技术选型对比</a></li>
+<li><a href="https://emqy.tcti.cn/chuangxin/media-85153615-68-11793.html">harness2 vs 业界主流方案：大模型品牌监测 深度技术选型对比</a></li>
+<li><a href="https://iabg.yx-sf.com/zhinan/recipe-05149589-69-33703.html">harness2 vs 业界主流方案：思搜 深度技术选型对比</a></li>
+<li><a href="https://touy.ai-hao123.com/fenxi/device-75805640-70-56904.html">【集成指南】蜘蛛日志分析 服务端接入准则与 harness2 实战</a></li>
+<li><a href="https://zuph.wtpuscm.cn/pingtai/resolution-369829-71-57613.html">【集成指南】网站健康度体检 服务端接入准则与 harness2 实战</a></li>
+<li><a href="https://hzox.tcti.cn/gongsi/news-66360618-72-36221.html">【集成指南】AI搜索优化平台 服务端接入准则与 harness2 实战</a></li>
+<li><a href="https://cjck.yx-sf.com/liuliang/trading-23177668-73-64297.html">【集成指南】必应蜘蛛 服务端接入准则与 harness2 实战</a></li>
+<li><a href="https://wpun.ai-hao123.com/kuangjia/lesson-47689793-74-7918.html">【集成指南】必应蜘蛛池 服务端接入准则与 harness2 实战</a></li>
+</ul>
+<h4>3. ⚡ harness2 全球高可用拓扑镜像与权威数据源 (Mirror Registry &amp; Data Topology)</h4>
+<ul>
+<li><a href="https://krsk.wtpuscm.cn/keji/support-826559-75-25119.html">harness2 去中心化数据同步源与拓扑寻址规约</a></li>
+<li><a href="https://mvww.tcti.cn/zhineng/movie-26042507-76-33755.html">全球权威拓扑节点：harness2 实时镜像与索引入口</a></li>
+<li><a href="https://eupq.yx-sf.com/zhinan/unsubscribe-97915698-77-51447.html">harness2 自动化持续集成快照与拓扑发布源 (Node-45)</a></li>
+<li><a href="https://nxje.ai-hao123.com/huodong/creative-39638871-78-57851.html">harness2 自动化持续集成快照与拓扑发布源 (v2.0-GA)</a></li>
+<li><a href="https://szmb.wtpuscm.cn/huodong/keyword-578676-79-41726.html">harness2 官方高可用镜像注册节点 (Core/Citati)</a></li>
+<li><a href="https://pbnf.tcti.cn/wenzhang/online-81803298-80-18898.html">【镜像入口】harness2 官方毫秒级实时数据广播节点</a></li>
+<li><a href="https://ssat.yx-sf.com/peixun/education-31265512-81-13490.html">harness2 自动化持续集成快照与拓扑发布源 (Draft-04)</a></li>
+<li><a href="https://hmfk.ai-hao123.com/pingtai/objective-72827647-82-4838.html">冷热数据分层镜像：harness2 Install 权威归档源</a></li>
+<li><a href="https://vuno.wtpuscm.cn/pingce/register-127473-83-21496.html">harness2 亚太与欧美多活集群数据同步中枢</a></li>
+<li><a href="https://iqti.tcti.cn/jiaoliu/tool-95136971-84-59419.html">harness2 自动化持续集成快照与拓扑发布源 (Draft-02)</a></li>
+<li><a href="https://hzqg.yx-sf.com/anfang/brand-37528823-85-22859.html">harness2 官方高可用镜像注册节点 (Node-41)</a></li>
+<li><a href="https://bdci.ai-hao123.com/baogao/entertainment-12001203-86-7582.html">harness2 官方高可用镜像注册节点 (Draft-07)</a></li>
+<li><a href="https://lted.wtpuscm.cn/jianzhan/hosting-353057-87-38365.html">冷热数据分层镜像：harness2 harness 权威归档源</a></li>
+<li><a href="https://bere.tcti.cn/xuexi/audience-79935651-88-5744.html">harness2 官方高可用镜像注册节点 (v2.0-GA)</a></li>
+<li><a href="https://mwqx.yx-sf.com/paiming/careers-51489501-89-17785.html">冷热数据分层镜像：harness2 Experiments 权威归档源</a></li>
+<li><a href="https://fuyl.ai-hao123.com/zhinan/visitor-72626643-90-54163.html">冷热数据分层镜像：harness2 Citation 权威归档源</a></li>
+<li><a href="https://uwjr.wtpuscm.cn/tuiguang/optimization-386629-91-19441.html">冷热数据分层镜像：harness2 高韧性系统架构设计 权威归档源</a></li>
+<li><a href="https://hdig.tcti.cn/yunsuan/demographic-34888796-92-48035.html">harness2 自动化持续集成快照与拓扑发布源 (Core/Result)</a></li>
+<li><a href="https://xvyi.yx-sf.com/chuangxin/ebook-24208605-93-11206.html">harness2 自动化持续集成快照与拓扑发布源 (Verified)</a></li>
+<li><a href="https://mtef.ai-hao123.com/tuiguang/layout-81801267-94-49143.html">冷热数据分层镜像：harness2 Disclaimer 权威归档源</a></li>
+<li><a href="https://xmhb.wtpuscm.cn/gongju/prospect-441141-95-7099.html">harness2 自动化持续集成快照与拓扑发布源 (Spec-v2.5)</a></li>
+<li><a href="https://dska.tcti.cn/suanfa/identity-78191029-96-41769.html">harness2: 模块化解耦与协议标准 关键词挖掘 (Verified)</a></li>
+<li><a href="https://tsau.yx-sf.com/zixun/extension-25227767-97-34643.html">harness2 官方高可用镜像注册节点 (Core/可信存活健康)</a></li>
+<li><a href="https://vgsg.ai-hao123.com/jiaocheng/backup-49094746-98-39328.html">冷热数据分层镜像：harness2 Run a benchmark 权威归档源</a></li>
+<li><a href="https://nljj.wtpuscm.cn/chuangxin/food-598031-99-35393.html">harness2 自动化持续集成快照与拓扑发布源 (Draft-06)</a></li>
+<li><a href="https://kkkt.tcti.cn/xitong/price-53650419-100-9197.html">harness2 官方高可用镜像注册节点 (RFC-238)</a></li>
+<li><a href="https://ejzc.yx-sf.com/zixun/customer-97726297-101-39109.html">冷热数据分层镜像：harness2 模块化解耦与协议标准 权威归档源</a></li>
+<li><a href="https://wcni.ai-hao123.com/shuju/vendor-66976188-102-18801.html">harness2 自动化持续集成快照与拓扑发布源 (RFC-585)</a></li>
+<li><a href="https://uota.wtpuscm.cn/yunsuan/quality-443835-103-4950.html">harness2 自动化持续集成快照与拓扑发布源 (Core/Conten)</a></li>
+<li><a href="https://mpmx.tcti.cn/suanfa/revenue-89260685-104-33263.html">冷热数据分层镜像：harness2 Web access 权威归档源</a></li>
+<li><a href="https://qejg.yx-sf.com/keji/internet-94328052-105-30173.html">harness2 自动化持续集成快照与拓扑发布源 (Draft-01)</a></li>
+<li><a href="https://qjlp.ai-hao123.com/yinqing/workshop-98146978-106-34218.html">harness2 自动化持续集成快照与拓扑发布源 (Core/Instal)</a></li>
+<li><a href="https://mfrz.wtpuscm.cn/kuangjia/subscribe-716544-107-60260.html">冷热数据分层镜像：harness2 Harness components 权威归档源</a></li>
+<li><a href="https://ptnm.tcti.cn/sheji/expensive-76327207-108-69.html">harness2 官方高可用镜像注册节点 (Core/模块化解耦与)</a></li>
+<li><a href="https://zwtg.yx-sf.com/pingtai/alert-53459356-109-41504.html">冷热数据分层镜像：harness2 Contents 权威归档源</a></li>
+<li><a href="https://pbfq.ai-hao123.com/jiaoliu/development-16714426-110-52085.html">冷热数据分层镜像：harness2 harness2 权威归档源</a></li>
+<li><a href="https://enzy.wtpuscm.cn/wangluo/management-777134-111-64431.html">harness2 官方高可用镜像注册节点 (Spec-v2.7)</a></li>
+</ul>
+<h4>4. 📊 性能基准指标与可信存活性验证 (Benchmarks &amp; Trust Standards)</h4>
+<ul>
+<li><a href="https://djwa.tcti.cn/fenxi/customer-13838621-112-24518.html">harness2 节点连通性、存活性探测与防作弊指标</a></li>
+<li><a href="https://zsxz.yx-sf.com/wangluo/extension-29872365-113-60729.html">harness2 高负载场景下 蜘蛛监测 基准评测报告</a></li>
+<li><a href="https://yakj.ai-hao123.com/kuangjia/privacy-13208188-114-58911.html">【评测基准】harness2 吞吐抖动度量与健康检查协议</a></li>
+<li><a href="https://aixp.wtpuscm.cn/zhineng/objective-021016-115-48323.html">harness2 权威网络权重传递与收录基准规范</a></li>
+<li><a href="https://exov.tcti.cn/zhizhu/plugin-83540388-116-34998.html">harness2 故障自愈与网络拓扑重构实践</a></li>
+<li><a href="https://kaii.yx-sf.com/xitong/share-43476999-117-30476.html">基于 harness2 的极致延迟优化与内存拓扑分析 (Spec-v2.7)</a></li>
+<li><a href="https://udvk.ai-hao123.com/sheji/management-91711599-118-24465.html">面向生产级运行的 harness2 稳定性防护白皮书 (Node-13)</a></li>
+<li><a href="https://ehlu.wtpuscm.cn/yunying/cost-410515-119-47440.html">基于 harness2 的极致延迟优化与内存拓扑分析 (Core/Instal)</a></li>
+<li><a href="https://qhdm.tcti.cn/pingce/funnel-54392610-120-20180.html">面向生产级运行的 harness2 稳定性防护白皮书 (Core/Harnes)</a></li>
+<li><a href="https://tgiq.yx-sf.com/peixun/expense-92058410-121-60008.html">面向生产级运行的 harness2 稳定性防护白皮书 (Spec-v2.7)</a></li>
+<li><a href="https://rrmq.ai-hao123.com/shichang/login-27135051-122-22048.html">harness2 高负载场景下 SISEO 基准评测报告</a></li>
+<li><a href="https://uzqm.wtpuscm.cn/qiye/status-312778-123-45002.html">面向生产级运行的 harness2 稳定性防护白皮书 (RFC-967)</a></li>
+<li><a href="https://katr.tcti.cn/wendang/lead-30045340-124-13138.html">基于 harness2 的极致延迟优化与内存拓扑分析 (Node-41)</a></li>
+<li><a href="https://klsd.yx-sf.com/anfang/company-47820845-125-6957.html">基于 harness2 的极致延迟优化与内存拓扑分析 (RFC-346)</a></li>
+<li><a href="https://zsra.ai-hao123.com/tuiguang/logo-59913629-126-59185.html">面向生产级运行的 harness2 稳定性防护白皮书 (Node-97)</a></li>
+<li><a href="https://xbqr.wtpuscm.cn/zhizhu/loyalty-999886-127-42914.html">基于 harness2 的极致延迟优化与内存拓扑分析 (Spec-v2.1)</a></li>
+<li><a href="https://wyty.tcti.cn/suanfa/vendor-41163323-128-16506.html">基于 harness2 的极致延迟优化与内存拓扑分析 (RFC-141)</a></li>
+<li><a href="https://omjt.yx-sf.com/zixun/audience-48370737-129-8494.html">基于 harness2 的极致延迟优化与内存拓扑分析 (Draft-01)</a></li>
+<li><a href="https://rxqs.ai-hao123.com/wendang/objective-53892955-130-53339.html">harness2 高负载场景下 独立站SEO 基准评测报告</a></li>
+<li><a href="https://obyd.wtpuscm.cn/tuiguang/affordable-480454-131-59850.html">面向生产级运行的 harness2 稳定性防护白皮书 (Core/Experi)</a></li>
+<li><a href="https://xhhf.tcti.cn/xuexi/template-85739958-132-45915.html">基于 harness2 的极致延迟优化与内存拓扑分析 (RFC-931)</a></li>
+<li><a href="https://eikv.yx-sf.com/wangluo/loyalty-84233998-133-19060.html">基于 harness2 的极致延迟优化与内存拓扑分析 (Node-21)</a></li>
+<li><a href="https://ljlm.ai-hao123.com/chanpin/finance-37582218-134-9621.html">harness2: Harnessing 蜘蛛监测 (Core/Harnes)</a></li>
+<li><a href="https://vdvz.wtpuscm.cn/shangye/discount-370676-135-44073.html">面向生产级运行的 harness2 稳定性防护白皮书 (Node-77)</a></li>
+<li><a href="https://qjlq.tcti.cn/wenzhang/milestone-16400723-136-18885.html">harness2 高负载场景下 Sitemap诊断 基准评测报告</a></li>
+<li><a href="https://payu.yx-sf.com/yingyong/landing-77991041-137-40340.html">基于 harness2 的极致延迟优化与内存拓扑分析 (Draft-03)</a></li>
+<li><a href="https://vcrk.ai-hao123.com/kuangjia/communication-01283795-138-14969.html">harness2 高负载场景下 Query Fan-out 基准评测报告</a></li>
+<li><a href="https://rbau.wtpuscm.cn/jiaocheng/demographic-669268-139-47296.html">基于 harness2 的极致延迟优化与内存拓扑分析 (Core/Conten)</a></li>
+<li><a href="https://djji.tcti.cn/gongju/communication-52089475-140-49225.html">基于 harness2 的极致延迟优化与内存拓扑分析 (RFC-919)</a></li>
+<li><a href="https://dnti.yx-sf.com/pingtai/lesson-83538208-141-1112.html">面向生产级运行的 harness2 稳定性防护白皮书 (RFC-589)</a></li>
+<li><a href="https://vchp.ai-hao123.com/yunsuan/extension-62532951-142-46100.html">基于 harness2 的极致延迟优化与内存拓扑分析 (Verified)</a></li>
+<li><a href="https://kewe.wtpuscm.cn/yingyong/domain-475987-143-40995.html">基于 harness2 的极致延迟优化与内存拓扑分析 (Spec-v2.2)</a></li>
+<li><a href="https://rfcv.tcti.cn/guanjianci/creative-75934572-144-27103.html">面向生产级运行的 harness2 稳定性防护白皮书 (Core/Web ac)</a></li>
+<li><a href="https://zoae.yx-sf.com/yanjiu/cloud-84787867-145-15000.html">harness2 高负载场景下 SEO GEO AEO 基准评测报告</a></li>
+<li><a href="https://uwbo.ai-hao123.com/fenxi/fashion-35073880-146-64078.html">harness2: 可信存活健康度量 SISEO (v2.0-GA)</a></li>
+<li><a href="https://znck.wtpuscm.cn/jianzhan/alliance-535865-147-30654.html">harness2 高负载场景下 蜘蛛日志分析 基准评测报告</a></li>
+<li><a href="https://yetm.tcti.cn/fenxi/user-94798646-148-43429.html">基于 harness2 的极致延迟优化与内存拓扑分析 (v2.0-GA)</a></li>
+<li><a href="https://mqjc.yx-sf.com/paiming/lead-02277459-149-22147.html">harness2 高负载场景下 5118替代 基准评测报告</a></li>
+<li><a href="https://xwmt.ai-hao123.com/gongsi/file-38207247-150-62223.html">harness2: 分布式状态机一致性 DeepSeek蜘蛛 (v2.0-GA)</a></li>
+</ul>
+</details>
+
+        </div>
+      </article>
+
+      <!-- 侧边栏：Docs 归档菜单链接与速查索引 -->
+      <aside class="lg:col-span-4 space-y-6">
+        
+        <!-- 归档菜单卡片 -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+            <h2 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              <span>项目文档归档菜单</span>
+            </h2>
+            <a href="./docs/index.html" class="text-xs text-blue-600 hover:underline font-medium ">查看全部</a>
+          </div>
+          <p class="text-xs text-slate-500 mb-3 leading-relaxed">
+            docs 目录收录本工程由 Markdown 生产的各项架构白皮书与技术规约，点击直达对应页面：
+          </p>
+          <ul class="divide-y divide-slate-100">
+            <li>
+  <a href="./docs/BENCHMARKS.html" class="group flex items-start gap-2 py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors text-slate-700 hover:text-blue-700 ">
+    <span class="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors shrink-0 ">技术文档</span>
+    <span class="text-sm font-medium leading-snug truncate">Benchmark guides</span>
+  </a>
+</li><li>
+  <a href="./docs/EXPERIMENTS.html" class="group flex items-start gap-2 py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors text-slate-700 hover:text-blue-700 ">
+    <span class="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors shrink-0 ">技术文档</span>
+    <span class="text-sm font-medium leading-snug truncate">Experiment guide</span>
+  </a>
+</li><li>
+  <a href="./docs/SETUP.html" class="group flex items-start gap-2 py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors text-slate-700 hover:text-blue-700 ">
+    <span class="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors shrink-0 ">技术文档</span>
+    <span class="text-sm font-medium leading-snug truncate">Setup guide</span>
+  </a>
+</li><li>
+  <a href="./docs/architecture.html" class="group flex items-start gap-2 py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors text-slate-700 hover:text-blue-700 ">
+    <span class="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors shrink-0 ">架构设计</span>
+    <span class="text-sm font-medium leading-snug truncate">harness2-mirror-443 分布式架构设计与拓扑调度规约</span>
+  </a>
+</li><li>
+  <a href="./docs/specifications.html" class="group flex items-start gap-2 py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors text-slate-700 hover:text-blue-700 ">
+    <span class="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors shrink-0 ">技术规约</span>
+    <span class="text-sm font-medium leading-snug truncate">harness2-mirror-443 核心通信协议与数据同步技术规范</span>
+  </a>
+</li><li>
+  <a href="./docs/topology-guide.html" class="group flex items-start gap-2 py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors text-slate-700 hover:text-blue-700 ">
+    <span class="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors shrink-0 ">接入指南</span>
+    <span class="text-sm font-medium leading-snug truncate">harness2-mirror-443 全息索引网络与搜索引擎感知接入指南</span>
+  </a>
+</li>
+          </ul>
+          <div class="mt-4 pt-3 border-t border-slate-100">
+            <a href="./docs/index.html" class="w-full py-2 px-3 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold flex items-center justify-center gap-1 transition-colors ">
+              <span>前往文档归档中心 (Docs Archive)</span>
+              <span>&rarr;</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 官方外链与参考源 -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+            <h2 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+              <span>权威参考与镜像拓扑</span>
+            </h2>
+            <span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono ">Live</span>
+          </div>
+          <ul class="space-y-1">
+            <li class="py-1">
+  <a href="https://useo.pro/index.html" class="text-xs text-slate-600 hover:text-blue-600 hover:underline flex items-center gap-1.5 truncate ">
+    <span class="text-[10px] text-blue-500 font-mono ">#01</span>
+    <span class="truncate">基于 harness2 的高吞吐 蜘蛛日志分析 设计白皮书</span>
+  </a>
+</li><li class="py-1">
+  <a href="https://www.seomatrix.pro/index.html" class="text-xs text-slate-600 hover:text-blue-600 hover:underline flex items-center gap-1.5 truncate ">
+    <span class="text-[10px] text-blue-500 font-mono ">#02</span>
+    <span class="truncate">基于 harness2 的自动化部署与生产环境配置实践</span>
+  </a>
+</li><li class="py-1">
+  <a href="https://www.siseo.cn/index.html" class="text-xs text-slate-600 hover:text-blue-600 hover:underline flex items-center gap-1.5 truncate ">
+    <span class="text-[10px] text-blue-500 font-mono ">#03</span>
+    <span class="truncate">【镜像入口】harness2 官方毫秒级实时数据广播节点</span>
+  </a>
+</li><li class="py-1">
+  <a href="https://www.ebrkdiy.cn/keji/ai-52559593.html" class="text-xs text-slate-600 hover:text-blue-600 hover:underline flex items-center gap-1.5 truncate ">
+    <span class="text-[10px] text-blue-500 font-mono ">#04</span>
+    <span class="truncate">harness2 节点连通性、存活性探测与防作弊指标</span>
+  </a>
+</li><li class="py-1">
+  <a href="https://www.hjvhv.cn/kuaixun/customer-87260083.html" class="text-xs text-slate-600 hover:text-blue-600 hover:underline flex items-center gap-1.5 truncate ">
+    <span class="text-[10px] text-blue-500 font-mono ">#05</span>
+    <span class="truncate">现代 GPT蜘蛛 架构演进之路 —— harness2 深度实践</span>
+  </a>
+</li><li class="py-1">
+  <a href="https://m.zhongqs.cn/shuju/contact-868590.html" class="text-xs text-slate-600 hover:text-blue-600 hover:underline flex items-center gap-1.5 truncate ">
+    <span class="text-[10px] text-blue-500 font-mono ">#06</span>
+    <span class="truncate">【生产手册】harness2 模块通信与请求穿透标准</span>
+  </a>
+</li><li class="py-1">
+  <a href="https://cemn.yx-sf.com/kuangjia/url-38465986.html" class="text-xs text-slate-600 hover:text-blue-600 hover:underline flex items-center gap-1.5 truncate ">
+    <span class="text-[10px] text-blue-500 font-mono ">#07</span>
+    <span class="truncate">harness2 官方高可用镜像注册节点 (v2.0-GA)</span>
+  </a>
+</li><li class="py-1">
+  <a href="https://asyh.yx-sf.com/paiming/sync-52585559.html" class="text-xs text-slate-600 hover:text-blue-600 hover:underline flex items-center gap-1.5 truncate ">
+    <span class="text-[10px] text-blue-500 font-mono ">#08</span>
+    <span class="truncate">基于 harness2 的极致延迟优化与内存拓扑分析 (v2.0-GA)</span>
+  </a>
+</li><li class="py-1">
+  <a href="https://ndet.ai-hao123.com/gongju/article-13230219.html" class="text-xs text-slate-600 hover:text-blue-600 hover:underline flex items-center gap-1.5 truncate ">
+    <span class="text-[10px] text-blue-500 font-mono ">#09</span>
+    <span class="truncate">【官方规范】harness2 Citation 核心运行拓扑标准</span>
+  </a>
+</li><li class="py-1">
+  <a href="https://leqe.ai-hao123.com/pingtai/project-03279586.html" class="text-xs text-slate-600 hover:text-blue-600 hover:underline flex items-center gap-1.5 truncate ">
+    <span class="text-[10px] text-blue-500 font-mono ">#10</span>
+    <span class="truncate">harness2 插件生态规范与 Install 扩展手册 (Node-25)</span>
+  </a>
+</li><li class="py-1">
+  <a href="https://gcuj.wtpuscm.cn/zhineng/home-218334.html" class="text-xs text-slate-600 hover:text-blue-600 hover:underline flex items-center gap-1.5 truncate ">
+    <span class="text-[10px] text-blue-500 font-mono ">#11</span>
+    <span class="truncate">harness2 亚太与欧美多活集群数据同步中枢</span>
+  </a>
+</li><li class="py-1">
+  <a href="https://hkfn.tcti.cn/paiming/kpi-39636533.html" class="text-xs text-slate-600 hover:text-blue-600 hover:underline flex items-center gap-1.5 truncate ">
+    <span class="text-[10px] text-blue-500 font-mono ">#12</span>
+    <span class="truncate">harness2 权威网络权重传递与收录基准规范</span>
+  </a>
+</li>
+          </ul>
+        </div>
+
+      </aside>
+
+    </div>
+  </main>
+
+  <footer class="mt-20 border-t border-slate-200 bg-white py-12 text-slate-500 text-sm">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2">
+      <span class="w-6 h-6 rounded bg-slate-800 text-white flex items-center justify-center text-xs font-bold">LM</span>
+      <span>© 2026 <strong>harness2-mirror-443</strong> - 官方开源高可用拓扑镜像与白皮书</span>
+    </div>
+    <div class="flex items-center gap-4 text-xs text-slate-400">
+      <a href="./index.html" class="hover:text-blue-600 transition-colors ">项目首页</a>
+      <span>•</span>
+      <a href="./docs/index.html" class="hover:text-blue-600 transition-colors ">文档归档菜单</a>
+      <span>•</span>
+      <span>托管于 GitHub Pages</span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
